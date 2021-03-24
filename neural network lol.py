@@ -1,147 +1,83 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[6]:
-
-
-print("helloworld")
-
-
-# In[7]:
-
-
-x = list(range(1,11))
-
-for i in range(0,10):
-    x[i] = x[i]**2
-    print(x[i])
-
-
-# In[3]:
-
-
-for n in range(1,11):
-    print(n)
-    pass
-    n+=1000
-print(n)
-print("ready")
-
-
-# In[5]:
-
-
-print("square of", n, "is", n**2)
-print("square root of", n, "is", n**0.5)
-
-
-# In[11]:
-
-
-def medium(x,y,z):
-    print( (x+y+z)//3 )
-medium(int(input()),int(input()),int(input()))
-
-
-# In[114]:
-
-
 import numpy
-import scipy.special
+import scipy
 import matplotlib.pyplot
-import random
-
-a = numpy.zeros([10, 10])
-for i in range(10):
-    for j in range(10):
-        if i%2==0:
-            if j%2==0:
-                a[i,j]=1
-
-matplotlib.pyplot.imshow(a,interpolation="lanczos")
-
-print(a)
-
-class Dog():
-    def __init__(self,petname,pettemp):
-        self.name = petname
-        self.temp = pettemp
-        
-    def bark(self):
-        print("гау гау")
-        
-    def status(self):
-            print("name:", self.name)
-            print("temp:",self.temp)
-            
-    def settemp(self,newtemp):
-        self.temp = newtemp
-        
-x = Dog("Mike", 37)
-y = Dog("stas", 10)
-x.bark()
-x.status()
-x.settemp(10)
-x.status()
-y.bark()
-y.status()
-
-
-# In[ ]:
-
-
-
-
-
-# In[58]:
-
-
-field = list(numpy.zeros[0,8])
-
-
-# In[120]:
-
 
 class Neuralnetwork:
     def __init__(self,innode,hidnode,outnode,learnrate):
-        self.inp_n=innode
-        self.hid_n=hidnode
-        self.out_n=outnode
+        
+        self.inp_n=innode #input nodes
+        self.hid_n=hidnode #hidden nodes
+        self.out_n=outnode #output nodes
         self.l_r=learnrate
         
         #генерация матриц слоев
-        #weights input-hidden
+        #wih = weights input-hidden
         self.wih = (numpy.random.normal(0, pow(self.hid_n, -0.5),(self.hid_n,self.inp_n)) )
-        #weights hidden-output
+        #who = weights hidden-output
         self.who = (numpy.random.normal(0, pow(self.hid_n, -0.5),(self.out_n,self.hid_n)) )
         
-    #тренировка сети                      
-    def train(self):
-        pass
     #опрос сети
-    def query(self):
+    def query(self, input_l):
+        
+        #normalisation(sigmoid)
         self.activ_func = lambda x: scipy.special.expit(x)
-        #outputs
-        self.out_i = numpy.dot(self.who,inputs)
+        
+        inputs = numpy.array(input_l, ndmin=2).T
+        
+        #hidden hid_i = hidden_inputs hid_o = hidden_outputs
+        hid_i = numpy.dot(self.wih,inputs)
+        hid_o=self.activ_func(hid_i)
+        
+        #outputs out_i = final_inputs out_o = final_outputs
+        out_i = numpy.dot(self.who,hid_o)
         out_o=self.activ_func(out_i)
         
-        self.out_i = numpy.dot(self.who,inputs)
-        out_o=self.activ_func(out_i)
+        return out_o
+    
         pass
-inpn=3
-hidn=3
-outn=3
+        
+    def train(self, input_l, target_l):
+        
+        inputs = numpy.array(input_l, ndmin=2).T
+        #targets - Целевое значение
+        targets = numpy.array(target_l, ndmin=2).T
+        
+        #outputs out_i = final_inputs out_o = final_outputs
+        self.out_i = numpy.dot(self.who,hid_o)
+        out_o=self.activ_func(out_i)
+        
+        #hidden hid_i = hidden_inputs hid_o = hidden_outputs
+        self.hid_i = numpy.dot(self.wih,inputs)
+        hid_o=self.activ_func(hid_i)
+        
+        out_e = targets - out_o
+        hid_e = targets - hid_o
+        
+        #обновление слоев
+        self.who = self.l_r * numpy.dot((out_e * out_o * (1-out_o)), numpy.transpose(hid_o))
+        self.wih = self.l_r * numpy.dot((hid_e * hid_o * (1-hid_o)), numpy.transpose(inputs))
+        pass
+inpn=784
+hidn=100
+outn=10
 lr=0.3
 
 nn1 = Neuralnetwork(inpn,hidn,outn,lr)
 
-print(nn1.wih)
-print()
-print(nn1.who)
+data_file=open("D:/neural networks/mnist_dataset/train.csv",'r')
+data_list=data_file.readlines()
+data_file.close()
 
-
-# In[ ]:
-
-
-
-
+for record in data_list[1:101]:
+    values = record.split(',')
+    inputs = numpy.asfarray(values[1:])
+    targets = numpy.zeros(outn) + 0.01
+    targets[int(values[0])] = 0.99
+    
+    
+num = 0
+values = data_list[num].split(',')
+colarray = numpy.asfarray(values[1:])
+image = colarray.reshape(28,28)
+matplotlib.pyplot.imshow(image, cmap = 'Greys', interpolation = 'None')
+print(data_list[num][0])
