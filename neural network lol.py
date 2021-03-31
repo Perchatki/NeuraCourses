@@ -57,8 +57,8 @@ class Neuralnetwork:
         hid_e = numpy.dot(self.who.T,out_e)
         
         #обновление слоев
-        self.who = self.l_r * numpy.dot((out_e * out_o * (1-out_o)), numpy.transpose(hid_o))
-        self.wih = self.l_r * numpy.dot((hid_e * hid_o * (1-hid_o)), numpy.transpose(inputs))
+        self.who += self.l_r * numpy.dot((out_e * out_o * (1-out_o)), numpy.transpose(hid_o))
+        self.wih += self.l_r * numpy.dot((hid_e * hid_o * (1-hid_o)), numpy.transpose(inputs))
         pass
 inpn = 784
 hidn = 100
